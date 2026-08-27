@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CFG Parser</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="page">
+
+    <header>
+      <span class="site-name">CFG Parser</span>
+      <nav>
+        <button class="sample-btn active" data-sample="arithmetic">Arithmetic</button>
+        <button class="sample-btn" data-sample="simplification">Unit &amp; Useless</button>
+        <button class="sample-btn" data-sample="ambiguous">Ambiguous</button>
+        <div class="dropdown-wrap">
+          <button id="btn-malformed-toggle" class="sample-btn muted">Malformed ▾</button>
+          <div id="malformed-menu" class="dropdown hidden">
+            <button data-malformed="0">Missing '->'</button>
+            <button data-malformed="1">Missing LHS</button>
+            <button data-malformed="2">Trailing pipe</button>
+            <button data-malformed="3">Undefined NT</button>
+            <button data-malformed="4">Empty input</button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <div class="left">
+        <div class="section-label">
+          Grammar
+          <div class="left-actions">
+            <label class="check-label">
+              <input type="checkbox" id="chk-strict"> strict
+            </label>
+            <button id="btn-clear" class="link-btn">clear</button>
+          </div>
+        </div>
+
+        <textarea id="grammar-input" spellcheck="false" placeholder="E -> E+T | T
+T -> T*F | F
+F -> (E) | id"></textarea>
+
+        <div class="editor-footer">
+          <span class="hint">A -&gt; α | β &nbsp;·&nbsp; ε or eps for epsilon</span>
+          <span id="line-counter">3 lines</span>
+        </div>
+
+        <button id="btn-parse" class="parse-btn">Parse</button>
+      </div>
+
+      <div class="right">
+        <div class="section-label">
+          Analysis
+          <div class="right-actions">
+            <span id="status-text" class="status"></span>
+            <button id="tab-visual" class="tab active">Summary</button>
+            <button id="tab-json" class="tab">JSON</button>
+          </div>
+        </div>
+
+        <div id="error-section" class="error-block hidden">
+          <p class="error-title">Parse errors</p>
+          <div id="errors-container"></div>
+        </div>
+
+        <div id="output-content">
+          <div class="meta-row">
+            <span class="mono meta-formula">G = (V<sub>N</sub>, V<sub>T</sub>, P, S)</span>
+            <span class="meta-stats">
+              S = <strong id="stat-start-symbol" class="mono">—</strong>
+              &nbsp;·&nbsp;
+              |V<sub>N</sub>| = <strong id="stat-nt-count" class="mono">—</strong>
+              &nbsp;·&nbsp;
+              |V<sub>T</sub>| = <strong id="stat-t-count" class="mono">—</strong>
+              &nbsp;·&nbsp;
+              |P| = <strong id="stat-prod-count" class="mono">—</strong>
+            </span>
+          </div>
+
+          <div id="view-visual" class="view active">
+            <div class="symbol-row">
+              <span class="sym-label">V<sub>N</sub></span>
+              <span id="nt-set-display" class="mono sym-val">—</span>
+            </div>
+            <div class="symbol-row">
+              <span class="sym-label">V<sub>T</sub></span>
+              <span id="t-set-display" class="mono sym-val">—</span>
+            </div>
+
+            <hr>
+
+            <table id="rules-table">
+              <thead>
+                <tr>
+                  <th>NT</th>
+                  <th></th>
+                  <th>Productions</th>
+                </tr>
+              </thead>
+              <tbody id="productions-table-body"></tbody>
+            </table>
+          </div>
+
+          <div id="view-json" class="view hidden">
+            <div class="json-header">
+              <span class="mono dim">grammar object</span>
+              <button id="btn-copy-json" class="link-btn">copy</button>
+            </div>
+            <pre id="json-output"><code></code></pre>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
