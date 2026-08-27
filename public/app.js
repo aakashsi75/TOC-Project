@@ -99,6 +99,10 @@ function renderSimplification(simp) {
     : 'None';
 
   simplificationContainer.innerHTML = `
+    <div class="pipeline-breadcrumb">
+      Original &nbsp;→&nbsp; <strong>1. Useless Symbol Removal</strong> &nbsp;→&nbsp; <strong>2. Epsilon Removal</strong> &nbsp;→&nbsp; <strong>3. Unit Removal</strong>
+    </div>
+
     <!-- Step 1: Remove Useless Symbols -->
     <div class="step-card">
       <div class="step-header">
