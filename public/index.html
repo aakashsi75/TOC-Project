@@ -61,6 +61,7 @@ F -> (E) | id"></textarea>
           <div class="right-actions">
             <span id="status-text" class="status"></span>
             <button id="tab-visual" class="tab active">Summary</button>
+            <button id="tab-simplify" class="tab">Simplification</button>
             <button id="tab-json" class="tab">JSON</button>
           </div>
         </div>
@@ -84,6 +85,7 @@ F -> (E) | id"></textarea>
             </span>
           </div>
 
+          <!-- Summary Tab -->
           <div id="view-visual" class="view active">
             <div class="symbol-row">
               <span class="sym-label">V<sub>N</sub></span>
@@ -108,6 +110,14 @@ F -> (E) | id"></textarea>
             </table>
           </div>
 
+          <!-- Simplification Tab -->
+          <div id="view-simplify" class="view hidden">
+            <div class="simplification-container" id="simplification-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- JSON Tab -->
           <div id="view-json" class="view hidden">
             <div class="json-header">
               <span class="mono dim">grammar object</span>
