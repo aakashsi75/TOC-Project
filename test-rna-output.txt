@@ -1,0 +1,118 @@
+
+> cfg-analysis-tool@1.0.0 test:rna
+> node test-rna.js
+
+
+================================================================================
+  PART 1: STRICT HAIRPIN GRAMMAR TEST CASES
+================================================================================
+
+  ✓ "gaaac" is accepted by strict grammar
+  ✓ "gaaac" yields exactly 1 distinct fold
+  ✓ "gaaac" fold is "(...)"
+  ✓ "gaac" is rejected (hairpin loop too short)
+  ✓ "aaaa" is rejected (outer bases cannot pair)
+  ✓ "gaaauc" is accepted by strict grammar
+  ✓ "gaaauc" yields exactly 1 distinct fold
+  ✓ "gaaauc" fold is "(....)"
+  ✓ "ggaaacc" is accepted by strict grammar
+  ✓ "ggaaacc" yields exactly 2 distinct folds
+  ✓ "ggaaacc" includes fold "((...))"
+  ✓ "ggaaacc" includes fold "(.....)"
+
+================================================================================
+  PART 2: PERMISSIVE FOLDING GRAMMAR TEST CASES
+================================================================================
+
+  ✓ "gc" is accepted by permissive grammar
+  ✓ "gc" has exactly 2 distinct folds
+  ✓ "gc" folds are exactly {"()", ".."}
+  ✓ "au" is accepted by permissive grammar
+  ✓ "au" has exactly 2 distinct folds
+  ✓ "au" folds are exactly {"()", ".."}
+  ✓ "ga" is accepted by permissive grammar
+  ✓ "ga" has exactly 1 distinct fold
+  ✓ "ga" fold is exactly ".."
+  ✓ "gg" is accepted by permissive grammar
+  ✓ "gg" has exactly 1 distinct fold
+  ✓ "gg" fold is exactly ".."
+
+================================================================================
+  PART 3: ERROR HANDLING & VALIDATION
+================================================================================
+
+  ✓ "gxc" triggers normalization error
+  ✓ "gxc" error names 'x' at position 2: "Unknown symbol 'x' at position 2. Expected one of: a, c, g, u"
+  ✓ 16-base sequence triggers error
+  ✓ 16-base sequence error clearly indicates length violation: "Sequence length 16 exceeds maximum limit of 15 nucleotides"
+  ✓ analyzeRNA surfaces invalid nucleotide error
+  ✓ analyzeRNA surfaces length limit error
+  ✓ Uppercase and whitespace normalize correctly
+  ✓ Custom grammar text uses the existing pipeline
+  ✓ Malformed grammar returns an error
+  ✓ Empty custom grammar returns an error
+  ✓ Invalid maxTrees (0) returns an error
+  ✓ Invalid maxTrees (-1) returns an error
+  ✓ Invalid maxTrees (1.5) returns an error
+  ✓ Invalid maxTrees (NaN) returns an error
+  ✓ Invalid maxTrees (Infinity) returns an error
+  ✓ Invalid maxTrees (5) returns an error
+  ✓ Truncation respects maxTrees and labels fold count as a lower bound
+  ✓ Fold treeCount counts enumerated trees
+  ✓ Strict grammar rejects the empty sequence
+  ✓ Permissive epsilon yields one valid empty fold
+  ✓ Tree conversion finds endpoint pairs without mutating the tree
+  ✓ validateFold accepts a legal hairpin
+  ✓ validateFold rejects incorrect tree leaves
+  ✓ validateFold rejects incorrect dot-bracket length
+  ✓ validateFold rejects illegal pairs
+  ✓ validateFold rejects crossing pairs
+  ✓ validateFold rejects missing pairs
+  ✓ validateFold requires a tree to check its leaves
+
+================================================================================
+  PART 4: INVARIANT & PROPERTY TESTS
+================================================================================
+
+  Testing all sequences of length 0 to 5 on PERMISSIVE preset (1365 sequences)...
+  ✓ Checked all 1,365 sequences of length 0..5 (elapsed: 1070ms)
+  ✓ validateFold passed for every single fold across all 1,365 sequences (7371 fold evaluations)
+  ✓ distinctFoldCount <= parseCount held for every non-truncated sequence
+
+  Testing 50 random sequences of length 6 to 12 on PERMISSIVE preset...
+  ✓ validateFold passed for all folds across 50 random sequences of length 6..12
+  ✓ distinctFoldCount <= parseCount held for all 50 random sequences
+
+================================================================================
+  PART 5: PARSE TREES VS. DISTINCT SECONDARY FOLDS
+================================================================================
+
+------------------------------------------------------------------------------------------------
+| Preset       | Sequence     | Total Parse Trees   | Distinct Folds  | Dot-Bracket Folds         |
+------------------------------------------------------------------------------------------------
+| strict       | ggaaacc      | 2                   | 2               | (.....), ((...))          |
+| permissive   | gcgc         | 39                  | 7               | ...., ..(), .()., ...     |
+| permissive   | gggaaaccc    | 47076 (500 enum)    | >= 1            | .........                 |
+------------------------------------------------------------------------------------------------
+
+
+================================================================================
+  PART 6: HTTP ENDPOINT TESTS
+================================================================================
+
+  ✓ /api/rna returns the analyzeRNA result (strict)
+  ✓ /api/rna returns the analyzeRNA result (permissive)
+  ✓ /api/rna honors custom grammar over preset
+  ✓ /api/rna rejects malformed request fields
+  ✓ /api/rna rejects malformed request fields
+  ✓ /api/rna rejects malformed request fields
+  ✓ /api/rna rejects malformed request fields
+  ✓ /api/rna surfaces sequence error (gxc)
+  ✓ /api/rna surfaces sequence error (acguacguacguacgu)
+  ✓ /api/rna distinguishes grammar rejection from invalid input
+  ✓ Existing /api/cyk response still works
+--------------------------------------------------------------------------------
+Total: 68 assertions, Passed: 68, Failed: 0
+ALL RNA FOLDING TESTS PASSED!
+
+

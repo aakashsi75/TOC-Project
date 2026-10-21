@@ -62,6 +62,10 @@ F -> (E) | id"></textarea>
             <span id="status-text" class="status"></span>
             <button id="tab-visual" class="tab active">Summary</button>
             <button id="tab-simplify" class="tab">Simplification</button>
+            <button id="tab-cnf" class="tab">CNF</button>
+            <button id="tab-trees" class="tab">Trees</button>
+            <button id="tab-resolve" class="tab">Resolve</button>
+            <button id="tab-rna" class="tab">RNA</button>
             <button id="tab-json" class="tab">JSON</button>
           </div>
         </div>
@@ -114,6 +118,145 @@ F -> (E) | id"></textarea>
           <div id="view-simplify" class="view hidden">
             <div class="simplification-container" id="simplification-container">
               <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- CNF Tab -->
+          <div id="view-cnf" class="view hidden">
+            <div class="simplification-container" id="cnf-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Trees Tab -->
+          <div id="view-trees" class="view hidden">
+            <div class="trees-toolbar">
+              <input id="trees-input" class="trees-string-input mono" type="text" placeholder="id+id*id" spellcheck="false">
+              <button id="btn-show-trees" class="parse-btn trees-parse-btn">Show trees</button>
+              <span class="trees-quickfill-label">Quick fill:</span>
+              <button class="trees-quick-btn" data-val="id+id*id">id+id*id</button>
+              <button class="trees-quick-btn" data-val="id+id+id">id+id+id</button>
+            </div>
+            <div id="trees-verdict" class="trees-verdict"></div>
+            <div id="trees-nav" class="trees-nav hidden">
+              <button id="btn-trees-prev" class="trees-nav-btn">‹ Prev</button>
+              <span id="trees-page-label" class="trees-page-label"></span>
+              <button id="btn-trees-next" class="trees-nav-btn">Next ›</button>
+            </div>
+            <div id="trees-canvas" class="trees-canvas"></div>
+          </div>
+
+          <!-- Resolve Tab (Ambiguity Resolution Demo) -->
+          <div id="view-resolve" class="view hidden">
+            <div class="resolve-presets">
+              <span class="resolve-preset-label">Preset:</span>
+              <button type="button" class="resolve-preset-btn active" data-preset="arithmetic">Arithmetic (Precedence &amp; Associativity)</button>
+              <button type="button" class="resolve-preset-btn" data-preset="linear">Linear Recursion (S → aS | Sa | a)</button>
+              <button type="button" class="resolve-preset-btn" data-preset="dangling">Dangling Else</button>
+            </div>
+
+            <div class="resolve-grammars-grid">
+              <div class="resolve-grammar-col">
+                <label for="resolve-grammar-a" class="resolve-label">Grammar A (ambiguous)</label>
+                <textarea id="resolve-grammar-a" class="resolve-textarea mono" spellcheck="false" rows="5"></textarea>
+              </div>
+              <div class="resolve-grammar-col">
+                <label for="resolve-grammar-b" class="resolve-label">Grammar B (resolved)</label>
+                <textarea id="resolve-grammar-b" class="resolve-textarea mono" spellcheck="false" rows="5"></textarea>
+              </div>
+            </div>
+
+            <div id="resolve-note" class="resolve-note dim">Note: Grammar B also accepts parentheses; default test strings stay inside the language both accept (no parentheses).</div>
+
+            <div class="resolve-strings-section">
+              <label for="resolve-strings" class="resolve-label">Test strings (one per line)</label>
+              <textarea id="resolve-strings" class="resolve-strings-textarea mono" spellcheck="false" rows="4"></textarea>
+            </div>
+
+            <div class="resolve-actions">
+              <button id="btn-resolve-compare" class="parse-btn">Compare</button>
+              <span id="resolve-status" class="status"></span>
+            </div>
+
+            <div id="resolve-error-block" class="error-block hidden" style="margin-top: 0.75rem;">
+              <p class="error-title">Resolution error</p>
+              <div id="resolve-error-msg" class="error-item"></div>
+            </div>
+
+            <div id="resolve-results" class="resolve-results hidden">
+              <table class="resolve-table" id="resolve-table">
+                <thead>
+                  <tr>
+                    <th style="width: 25%;">String</th>
+                    <th style="width: 37%;">Grammar A</th>
+                    <th style="width: 38%;">Grammar B</th>
+                  </tr>
+                </thead>
+                <tbody id="resolve-table-body"></tbody>
+              </table>
+
+              <div id="resolve-summary" class="resolve-summary"></div>
+              <div id="resolve-explanation" class="resolve-explanation"></div>
+
+              <div id="resolve-trees-container" class="resolve-trees-container hidden">
+                <div class="resolve-trees-header">
+                  Parse Trees for <code id="resolve-selected-string" class="mono"></code>
+                  <span class="dim" style="font-weight: normal; font-size: 12px; margin-left: 0.5rem;">(Click a row above to select another string)</span>
+                </div>
+                <div class="resolve-trees-panes">
+                  <div class="resolve-tree-pane" id="resolve-pane-a">
+                    <div class="resolve-pane-title">Grammar A (Ambiguous)</div>
+                    <div id="resolve-nav-a" class="trees-nav hidden">
+                      <button id="btn-resolve-prev-a" class="trees-nav-btn">‹ Prev pair</button>
+                      <span id="resolve-page-label-a" class="trees-page-label"></span>
+                      <button id="btn-resolve-next-a" class="trees-nav-btn">Next pair ›</button>
+                    </div>
+                    <div id="resolve-canvas-a" class="resolve-pane-canvas"></div>
+                  </div>
+                  <div class="resolve-tree-pane" id="resolve-pane-b">
+                    <div class="resolve-pane-title">Grammar B (Resolved)</div>
+                    <div id="resolve-canvas-b" class="resolve-pane-canvas"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RNA Tab (Secondary RNA Folding Analysis) -->
+          <div id="view-rna" class="view hidden">
+            <div class="rna-toolbar">
+              <input id="rna-input" class="rna-seq-input mono" type="text" aria-label="RNA sequence" placeholder="GGAAACC" spellcheck="false" autocomplete="off" value="GGAAACC">
+              <select id="rna-preset" class="rna-preset-select" aria-label="Folding preset">
+                <option value="strict">Strict hairpin</option>
+                <option value="permissive">Permissive</option>
+              </select>
+              <button id="btn-rna-fold" class="parse-btn">Fold</button>
+              <span class="rna-quickfill-label">Quick fill:</span>
+              <button type="button" class="rna-quick-btn" data-seq="GGAAACC" data-preset="strict">GGAAACC</button>
+              <button type="button" class="rna-quick-btn" data-seq="GCGC" data-preset="permissive">GCGC</button>
+            </div>
+            <div class="rna-disclaimer dim">Sample sequences are illustrative, not real molecules.</div>
+
+            <div id="rna-verdict" class="rna-verdict" role="status" aria-live="polite" aria-atomic="true"></div>
+
+            <div id="rna-output-container" class="rna-output-container hidden">
+              <!-- Large Arc Diagram -->
+              <div class="rna-section-title">Secondary Structure Arc Diagram:</div>
+              <div id="rna-arc-container" class="rna-arc-container"></div>
+              <div id="rna-selected-bracket" class="rna-selected-bracket mono"></div>
+
+              <!-- Fold Gallery -->
+              <div class="rna-section-title" style="margin-top: 1rem;">Fold Gallery:</div>
+              <div id="rna-gallery-grid" class="rna-gallery-grid"></div>
+              <div class="rna-note dim">Possible folds, not ranked by stability.</div>
+              <div class="rna-note dim">Crossing pairs (pseudoknots) cannot be generated by a context-free grammar.</div>
+
+              <!-- Tree Link Section -->
+              <div id="rna-tree-section" class="rna-tree-section">
+                <div class="rna-section-title">Parse Tree for Selected Fold:</div>
+                <p class="rna-note">Hover or focus a node to highlight its bases. Click or press Enter to keep the selection.</p>
+                <div id="rna-tree-canvas" class="rna-tree-canvas"></div>
+              </div>
             </div>
           </div>
 
