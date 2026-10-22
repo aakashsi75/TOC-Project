@@ -32,7 +32,6 @@ Commands are tokenised and checked using a context-free grammar. The grammar is 
 | Other `src/core/` modules | Grammar parsing, simplification, CNF, CYK and parse-tree algorithms. |
 | `src/localWorkspace.js` | Local snapshots, preview checks and reviewed filesystem operations. |
 | `src/server.js` | Express server and command/local-folder APIs. |
-| `tests/` | Core algorithm, browser renderer, simulation and local-folder checks. |
 | `docs/` | [Project report](docs/CmdPrelude_TOC_Project_Report.docx) and [architecture diagram](docs/CmdPrelude_Architecture.png). |
 
 ## Limits
@@ -41,13 +40,10 @@ Inputs are limited to 512 characters and 40 tokens. Variables, wildcard expansio
 
 Preview does not execute command text in the operating system. Real-folder changes require explicit review and use Node.js file APIs. Only selected single Basic operations can be applied; advanced commands remain preview-only. Preview fingerprints detect stale folder state. Applied changes have no automatic backup or real-folder undo. Virtual undo only affects the virtual workspace.
 
-## Tests
+## Repository versions
 
-```sh
-npm test
-```
-
-Individual suites are available as `npm run test:parser`, `test:simplifier`, `test:cnf`, `test:cyk`, `test:ambiguity`, `test:trees`, `test:simulator` and `test:local-folder`.
+- `main`: application and project documentation without test files.
+- [with-tests](https://github.com/aakashsi75/TOC-Project/tree/with-tests): the same application with the complete test suite. Run `npm test` on that branch.
 
 ## References
 

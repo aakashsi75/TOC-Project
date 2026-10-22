@@ -5,16 +5,7 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
-    "test": "node --test",
-    "test:parser": "node tests/test-parser.js",
-    "test:simplifier": "node tests/test-simplifier.js",
-    "test:cnf": "node tests/test-cnf.js",
-    "test:cyk": "node tests/test-cyk.js",
-    "test:ambiguity": "node tests/test-ambiguity.js",
-    "test:trees": "node tests/test-treeRenderer.js",
-    "test:simulator": "node --test tests/test-simulator.js",
-    "test:local-folder": "node --test tests/test-localWorkspace.js"
+    "start": "node src/server.js"
   },
   "dependencies": {
     "express": "^4.21.2"
