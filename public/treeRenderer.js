@@ -1,6 +1,6 @@
 /**
  * Pure SVG Parse Tree Renderer (Zero External Dependencies)
- * Browser ES Module mirror of src/core/treeRenderer.js
+ * Shared browser renderer, also exercised directly by the renderer tests.
  */
 
 function escapeXml(unsafe) {

@@ -2,8 +2,8 @@
  * CLI Test Runner for CFG Grammar Parser
  */
 
-import { parseGrammar } from './src/core/grammarParser.js';
-import { SAMPLE_GRAMMARS, MALFORMED_TEST_CASES } from './src/core/sampleGrammars.js';
+import { parseGrammar } from '../src/core/grammarParser.js';
+import { SAMPLE_GRAMMARS, MALFORMED_TEST_CASES } from './fixtures/sampleGrammars.js';
 
 const ANSI = {
   reset: '\x1b[0m',

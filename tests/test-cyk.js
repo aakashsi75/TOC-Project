@@ -9,11 +9,11 @@
  * 5. Detailed Triangular CYK Table Printout for "id+id*id"
  */
 
-import { parseGrammar } from './src/core/grammarParser.js';
-import { simplifyGrammar } from './src/core/simplifier.js';
-import { convertToCNF } from './src/core/cnf.js';
-import { cykParse, formatCYKTable } from './src/core/cyk.js';
-import { SAMPLE_GRAMMARS } from './src/core/sampleGrammars.js';
+import { parseGrammar } from '../src/core/grammarParser.js';
+import { simplifyGrammar } from '../src/core/simplifier.js';
+import { convertToCNF } from '../src/core/cnf.js';
+import { cykParse, formatCYKTable } from '../src/core/cyk.js';
+import { SAMPLE_GRAMMARS } from './fixtures/sampleGrammars.js';
 
 const ANSI = {
   reset: '\x1b[0m',
@@ -179,71 +179,4 @@ topDerivations.forEach((d, idx) => {
   console.log(`    - Right : [${d.right.i}, len=${d.right.len}] -> ${d.right.symbol}`);
 });
 
-// ============================================================================
-// PART 6: REGRESSION — /api/cyk field-name fix (inputString + options object)
-// Simulates the exact payload the Trees-tab frontend sends and asserts that
-// the handler resolves inputString correctly (previously read `input` only).
-// ============================================================================
-printDivider('Part 6: Regression — inputString field & options object');
-
-function simulateCYKHandler(body) {
-  const { grammar, grammarText, input, inputString, options, strict } = body;
-  const rawGrammar = grammar !== undefined ? grammar : grammarText;
-  if (rawGrammar === undefined) return { success: false, error: 'Missing grammar' };
-
-  const rawInput = inputString !== undefined ? inputString : input;
-  if (rawInput === undefined || typeof rawInput !== 'string') {
-    return { success: false, error: 'No input string provided' };
-  }
-
-  const resolvedOptions = options !== undefined
-    ? options
-    : (strict !== undefined ? { strictNonTerminals: Boolean(strict) } : {});
-
-  const parsed = parseGrammar(rawGrammar, resolvedOptions);
-  if (!parsed.success) return parsed;
-
-  const simplified = simplifyGrammar(parsed.grammar);
-  const cnf = convertToCNF(simplified.final);
-  const cyk = cykParse(cnf.final, rawInput);
-  return { success: true, cyk, accepted: cyk.accepted };
-}
-
-// Test 1: exact payload from Trees-tab (E -> E+E | E*E | id, "id+id+id")
-console.log(`${ANSI.bold}Test 1: exact Trees-tab payload (inputString + options object)${ANSI.reset}`);
-const reg1 = simulateCYKHandler({
-  grammarText: 'E -> E+E | E*E | id',
-  inputString: 'id+id+id',
-  options: { strictNonTerminals: false }
-});
-assert(reg1.success === true, 'Handler succeeded with inputString field');
-assert(reg1.accepted === true, 'id+id+id accepted by ambiguous grammar');
-assert(reg1.cyk.tokens.length === 5, `Tokenizer produced 5 tokens (got ${reg1.cyk.tokens.length}): [${reg1.cyk.tokens.join(', ')}]`);
-
-// Test 2: legacy `input` field still works (backward-compat)
-console.log(`\n${ANSI.bold}Test 2: legacy "input" field (backward-compat)${ANSI.reset}`);
-const reg2 = simulateCYKHandler({
-  grammarText: 'E -> E+E | E*E | id',
-  input: 'id+id*id',
-  strict: false
-});
-assert(reg2.success === true, 'Handler succeeded with legacy input field');
-assert(reg2.accepted === true, 'id+id*id accepted via legacy input field');
-
-// Test 3: missing inputString (and no input) -> clear error, no crash
-console.log(`\n${ANSI.bold}Test 3: missing inputString -> clear error${ANSI.reset}`);
-const reg3 = simulateCYKHandler({
-  grammarText: 'E -> E+E | E*E | id',
-  options: { strictNonTerminals: false }
-  // inputString omitted intentionally
-});
-assert(reg3.success === false, 'Handler returned failure for missing inputString');
-assert(typeof reg3.error === 'string', 'Handler returned a string error message');
-assert(reg3.error === 'No input string provided', `Error text is correct: "${reg3.error}"`);
-
-console.log();
-console.log(`${ANSI.bgGreen} ALL ${passedAssertions}/${totalAssertions} CYK ASSERTIONS PASSED SUCCESSFULLY! ${ANSI.reset}\n`);
-
-
-console.log();
-console.log(`${ANSI.bgGreen} 🎉 ALL ${passedAssertions}/${totalAssertions} CYK ASSERTIONS PASSED SUCCESSFULLY! ${ANSI.reset}\n`);
+console.log(`ALL ${passedAssertions}/${totalAssertions} CYK ASSERTIONS PASSED SUCCESSFULLY!`);

@@ -3,14 +3,14 @@
  * Demonstrates incremental 3-step transformation on the "Unit & Useless" test grammar.
  */
 
-import { parseGrammar, formatGrammar } from './src/core/grammarParser.js';
+import { parseGrammar, formatGrammar } from '../src/core/grammarParser.js';
 import {
   removeUselessSymbols,
   removeEpsilonProductions,
   removeUnitProductions,
   simplifyGrammar
-} from './src/core/simplifier.js';
-import { SAMPLE_GRAMMARS } from './src/core/sampleGrammars.js';
+} from '../src/core/simplifier.js';
+import { SAMPLE_GRAMMARS } from './fixtures/sampleGrammars.js';
 
 console.log('================================================================================');
 console.log('       CONTEXT-FREE GRAMMAR SIMPLIFICATION — INCREMENTAL 3-STEP PIPELINE       ');

@@ -20,10 +20,10 @@
  * 5. Bracket notation printout for "id+id*id" on the ambiguous grammar
  */
 
-import { parseGrammar } from './src/core/grammarParser.js';
-import { simplifyGrammar } from './src/core/simplifier.js';
-import { convertToCNF } from './src/core/cnf.js';
-import { cykParse } from './src/core/cyk.js';
+import { parseGrammar } from '../src/core/grammarParser.js';
+import { simplifyGrammar } from '../src/core/simplifier.js';
+import { convertToCNF } from '../src/core/cnf.js';
+import { cykParse } from '../src/core/cyk.js';
 import {
   countParses,
   buildTrees,
@@ -31,8 +31,8 @@ import {
   analyzeAmbiguity,
   treeToBracket,
   treeToString
-} from './src/core/parseTrees.js';
-import { SAMPLE_GRAMMARS } from './src/core/sampleGrammars.js';
+} from '../src/core/parseTrees.js';
+import { SAMPLE_GRAMMARS } from './fixtures/sampleGrammars.js';
 
 const ANSI = {
   reset: '\x1b[0m',

@@ -9,13 +9,13 @@
  * 5. getTreeDimensions helper correctness.
  */
 
-import { parseGrammar } from './src/core/grammarParser.js';
-import { simplifyGrammar } from './src/core/simplifier.js';
-import { convertToCNF } from './src/core/cnf.js';
-import { cykParse } from './src/core/cyk.js';
-import { analyzeAmbiguity, treeToBracket } from './src/core/parseTrees.js';
-import { renderTree, getTreeDimensions, deriveGrouping } from './src/core/treeRenderer.js';
-import { SAMPLE_GRAMMARS } from './src/core/sampleGrammars.js';
+import { parseGrammar } from '../src/core/grammarParser.js';
+import { simplifyGrammar } from '../src/core/simplifier.js';
+import { convertToCNF } from '../src/core/cnf.js';
+import { cykParse } from '../src/core/cyk.js';
+import { analyzeAmbiguity, treeToBracket } from '../src/core/parseTrees.js';
+import { renderTree, getTreeDimensions, deriveGrouping } from '../public/treeRenderer.js';
+import { SAMPLE_GRAMMARS } from './fixtures/sampleGrammars.js';
 
 const ANSI = {
   reset: '\x1b[0m',
@@ -118,14 +118,14 @@ const rangeTree = { symbol: 'S', children: [
   { symbol: 'g', terminal: true },
   { symbol: 'L', children: [{ symbol: 'a', terminal: true }, { symbol: 'c', terminal: true }] }
 ] };
-const { renderTree: renderBrowserTree } = await import('./public/treeRenderer.js');
-for (const renderer of [renderTree, renderBrowserTree]) {
+{
+  const renderer = renderTree;
   const ordinary = renderer(structuredClone(rangeTree));
   const ranged = renderer(structuredClone(rangeTree), { includeLeafRange: true });
   assert(!ordinary.includes('data-leaf-start'), 'Default tree output omits optional leaf ranges');
   assert(ranged.replace(/ data-leaf-(?:start|end)="\d+"/g, '') === ordinary, 'Optional ranges leave all other SVG markup unchanged');
-  assert(ranged.includes('data-leaf-start="0" data-leaf-end="2"'), 'Root range covers all sequence bases');
-  assert(ranged.includes('data-leaf-start="1" data-leaf-end="2"'), 'Subtree range covers exactly its descendant bases');
+  assert(ranged.includes('data-leaf-start="0" data-leaf-end="2"'), 'Root range covers all token leaves');
+  assert(ranged.includes('data-leaf-start="1" data-leaf-end="2"'), 'Subtree range covers exactly its descendant token leaves');
   assert((ranged.match(/data-leaf-start=/g) || []).length === 5, 'Every SVG node exposes a leaf index range');
 }
 

@@ -6,9 +6,9 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
-import { simulateCommand, parseCommand, lexCommand, resolvePath, sampleWorkspace, validateWorkspace, COMMAND_GRAMMAR, READ_ONLY_GRAMMAR } from './src/core/commandSimulator.js';
-import { compileCommandGrammar } from './src/core/commandGrammar.js';
-import { metadataSnapshot, scanDirectoryMetadata } from './public/workspaceImport.js';
+import { simulateCommand, parseCommand, lexCommand, resolvePath, sampleWorkspace, validateWorkspace, COMMAND_GRAMMAR, READ_ONLY_GRAMMAR } from '../src/core/commandSimulator.js';
+import { compileCommandGrammar } from '../src/core/commandGrammar.js';
+import { metadataSnapshot, scanDirectoryMetadata } from '../public/workspaceImport.js';
 
 const entry = (result, path) => result.after.entries.find(item => item.path === path);
 const run = command => simulateCommand(command);
@@ -350,7 +350,7 @@ test('ambiguous or unsupported custom connector groupings never silently choose 
   assert.equal(flat.changes.length, 0);
 });
 
-test('simulator API, conversion page and existing CFG endpoints work together', async t => {
+test('command interface, simulation and reviewed local-folder APIs work together', async t => {
   const child = spawn(process.execPath, ['src/server.js'], { env: { ...process.env, PORT: '0' }, stdio: ['ignore', 'pipe', 'pipe'] });
   t.after(async () => { if (child.exitCode === null) { const finished = once(child, 'exit'); child.kill(); await finished; } });
   const port = await new Promise((resolve, reject) => {
@@ -367,9 +367,13 @@ test('simulator API, conversion page and existing CFG endpoints work together', 
   const result = await response.json();
   assert.equal(result.exitCode, 0); assert.equal(result.changes.length, 3);
   assert.ok((await (await fetch(base)).text()).includes('Before You Run'));
-  assert.ok((await (await fetch(base + '/grammar.html')).text()).includes('Command conversions'));
-  const legacy = await fetch(base + '/api/cyk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ grammarText: 'S -> a', inputString: 'a' }) });
-  assert.equal((await legacy.json()).accepted, true);
+  for (const asset of ['/simulator.js', '/simulator.css', '/treeRenderer.js', '/workspaceImport.js']) {
+    assert.equal((await fetch(base + asset)).status, 200, asset);
+  }
+  for (const retired of ['/api/cyk', '/api/rna', '/api/compare', '/api/parse', '/api/simplify', '/api/cnf', '/api/ambiguity', '/api/samples', '/grammar.html', '/app.js', '/styles.css']) {
+    const response = await fetch(base + retired, { method: retired.startsWith('/api/') && retired !== '/api/samples' ? 'POST' : 'GET' });
+    assert.equal(response.status, 404, retired);
+  }
   const invalid = await fetch(base + '/api/simulate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ command: 'ls', workspace: { entries: [] } }) });
   assert.equal((await invalid.json()).accepted, false);
   const grammarResult = await fetch(base + '/api/simulate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ command: 'rm notes.txt', grammarText: READ_ONLY_GRAMMAR }) });

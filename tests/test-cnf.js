@@ -7,10 +7,10 @@
  * 3. Long Production Grammar (S -> aSbSc | a)
  */
 
-import { parseGrammar, formatGrammar } from './src/core/grammarParser.js';
-import { simplifyGrammar } from './src/core/simplifier.js';
-import { convertToCNF, isCNF } from './src/core/cnf.js';
-import { SAMPLE_GRAMMARS } from './src/core/sampleGrammars.js';
+import { parseGrammar, formatGrammar } from '../src/core/grammarParser.js';
+import { simplifyGrammar } from '../src/core/simplifier.js';
+import { convertToCNF, isCNF } from '../src/core/cnf.js';
+import { SAMPLE_GRAMMARS } from './fixtures/sampleGrammars.js';
 
 const ANSI = {
   reset: '\x1b[0m',

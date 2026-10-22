@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { openLocalWorkspace, previewLocalWorkspace, applyLocalWorkspace } from './src/localWorkspace.js';
-import { BASIC_GRAMMAR, COMMAND_GRAMMAR } from './src/core/commandGrammar.js';
-import { parseCommand } from './src/core/commandSimulator.js';
+import { openLocalWorkspace, previewLocalWorkspace, applyLocalWorkspace } from '../src/localWorkspace.js';
+import { BASIC_GRAMMAR, COMMAND_GRAMMAR } from '../src/core/commandGrammar.js';
+import { parseCommand } from '../src/core/commandSimulator.js';
 
 async function fixture(t) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'before-you-run-test-'));
