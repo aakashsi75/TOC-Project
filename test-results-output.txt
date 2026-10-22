@@ -1,11 +1,3 @@
-test:parser: PASS (exit 0)
-test:simplifier: PASS (exit 0)
-test:cnf: PASS (exit 0)
-test:cyk: PASS (exit 0)
-test:ambiguity: PASS (exit 0)
-test:trees: PASS (exit 0)
-test:compare: PASS (exit 0)
-test:rna: PASS (exit 0)
 
 test:parser
 
@@ -1056,7 +1048,7 @@ test:rna
 ================================================================================
 
   Testing all sequences of length 0 to 5 on PERMISSIVE preset (1365 sequences)...
-  ✓ Checked all 1,365 sequences of length 0..5 (elapsed: 1160ms)
+  ✓ Checked all 1,365 sequences of length 0..5 (elapsed: 1972ms)
   ✓ validateFold passed for every single fold across all 1,365 sequences (7371 fold evaluations)
   ✓ distinctFoldCount <= parseCount held for every non-truncated sequence
 
@@ -1096,3 +1088,74 @@ test:rna
 Total: 68 assertions, Passed: 68, Failed: 0
 ALL RNA FOLDING TESTS PASSED!
 
+
+test:simulator
+
+> cfg-analysis-tool@1.0.0 test:simulator
+> node --test test-simulator.js
+
+✔ existing CFG pipeline parses token classes, source spans, and an unambiguous tree (15.3172ms)
+✔ recursive groups use the existing CFG tree and restore all original terminal occurrences (23.7828ms)
+✔ grouping changes conditional evaluation and maintains left association outside groups (6.7971ms)
+✔ groups isolate cwd, retain file changes, inherit pipe input and can produce pipeline output (8.251ms)
+✔ empty, adjacent, unbalanced and incomplete groups are rejected while literal parentheses remain words (18.347ms)
+✔ repairs balance recursive groups, verify with CYK, and explain missing operands without inventing paths (14.0359ms)
+✔ quote concatenation, escaped spaces, empty strings, and quoted operators are literals (5.6084ms)
+✔ unsupported syntax is rejected rather than interpreted or partially executed (1.4564ms)
+✔ invalid syntax has bounded, CYK-verified repair suggestions (6.3865ms)
+✔ copy previews one new file without mutating its input snapshot (1.6493ms)
+✔ recursive deletion lists every affected entry and warns on protected paths (2.9563ms)
+✔ mkdir -p, touch, and relative paths compose across virtual states (1.7285ms)
+✔ moves retain contents, report both paths, and reject recursive self-copy (3.3946ms)
+✔ overwrites are modifications; unsupported flags and directory merges fail atomically (2.5042ms)
+✔ && and || short-circuit with equal precedence and left association (2.29ms)
+✔ pipes bind tighter and transport stdout while keeping stderr separate (5.7206ms)
+✔ pipeline cd does not leak while normal cd changes the virtual directory (2.4038ms)
+✔ listing, --, unsupported executables, and literal grep have explicit behavior (3.311ms)
+✔ imported folder snapshots contain metadata only and preserve empty directories (1.5128ms)
+✔ malformed and oversized snapshots are rejected before simulation (2.6345ms)
+✔ native directory traversal reads metadata only, preserves empty folders, and skips excluded subtrees (1.7788ms)
+✔ trailing slashes do not silently turn files into directories (2.7852ms)
+✔ successive operations maintain a valid snapshot across a generated sequence (68.1008ms)
+✔ default grammar rejects missing or extra operands before interpretation (3.5151ms)
+✔ contextual classification distinguishes keywords, paths, text, patterns, and flags (2.3551ms)
+✔ read-only grammar changes acceptance and records removal of unreachable command rules (4.1955ms)
+✔ custom grammar really controls arity but cannot invent command behavior (2.0808ms)
+✔ editable grammar returns distinct authored, epsilon-free, simplified, and CNF stages (0.7052ms)
+✔ invalid grammars fail explicitly, including limits and undefined token classes (0.7604ms)
+✔ repair suggestions use the active custom grammar, not the default (0.4433ms)
+✔ ambiguous or unsupported custom connector groupings never silently choose behavior (0.973ms)
+✔ simulator API, conversion page and existing CFG endpoints work together (441.5247ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 814.3061
+
+test:local-folder
+
+> cfg-analysis-tool@1.0.0 test:local-folder
+> node --test test-localWorkspace.js
+
+✔ opening a folder larger than 64 MB reads metadata only and permits unrelated file operations (64.2683ms)
+✔ local folders with more than 1,500 entries can open, preview and apply (2055.1363ms)
+✔ Basic grammar accepts five commands but rejects flags, chains and other commands (1.6728ms)
+✔ open includes empty directories; preview never writes; apply preserves binary bytes (30.6785ms)
+✔ overwrite and deletion apply directly without creating recovery copies (34.3078ms)
+✔ mkdir and directory rename apply without losing nested files (33.2655ms)
+✔ folder changes invalidate preview; wrong session/plan IDs cannot apply (13.5279ms)
+✔ excluded subtrees, roots and advanced operations cannot produce an apply plan (25.1779ms)
+✔ a new preview invalidates the previous plan and Windows case aliases are blocked (11.58ms)
+✔ filesystem failure reports the error without backup copies or a reusable plan (13.1331ms)
+✔ directory links cannot be imported or used to escape the selected folder (6.403ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2445.0629

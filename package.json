@@ -13,7 +13,9 @@
     "test:ambiguity": "node test-ambiguity.js",
     "test:trees": "node test-treeRenderer.js",
     "test:compare": "node test-compare.js",
-    "test:rna": "node test-rna.js"
+    "test:rna": "node test-rna.js",
+    "test:simulator": "node --test test-simulator.js",
+    "test:local-folder": "node --test test-localWorkspace.js"
   },
   "dependencies": {
     "express": "^4.21.2"

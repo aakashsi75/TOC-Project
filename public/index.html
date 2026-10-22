@@ -2,279 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CFG Parser</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Understand shell commands before you run them. Preview changes to a sample workspace or a read-only folder snapshot.">
+  <title>Before You Run — Command Playground</title>
+  <link rel="stylesheet" href="simulator.css">
 </head>
 <body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Before You Run home"><span class="brand-mark">&gt;_</span> before you run<span class="brand-dot">.</span></a>
+    <nav aria-label="Main navigation"><button id="playground-tab" role="tab" aria-selected="true" class="text-button nav-current">Playground</button><button id="conversions-tab" role="tab" aria-selected="false" class="text-button">Command conversions</button><button id="help-button" class="text-button">Supported commands</button></nav>
+  </header>
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">A LITTLE FORESIGHT GOES A LONG WAY</p><h1>Know the command.<br><span>See the consequences.</span></h1><p class="intro-copy">A command is a small line with a big impact. Explore what it changes,<br class="desktop-break"> follow the logic, and catch surprises before they happen.</p></div>
+      <div class="intro-aside"><span class="orbit" aria-hidden="true">↳</span><p>Real parsing.<br>Virtual consequences.</p><span class="aside-detail">Bash-style subset · Explicit file operations</span></div>
+    </section>
 
-  <div class="page">
+    <div id="playground-view" role="tabpanel" aria-labelledby="playground-tab">
+    <div class="mode-bar"><label for="command-mode">Language</label><select id="command-mode"><option value="basic">Basic · ls, mkdir, cp, mv, rm</option><option value="full">Advanced · groups, pipes &amp; chains</option><option value="custom">Custom grammar</option></select><span id="mode-hint">One command, simple paths, no flags.</span></div>
+    <section class="command-panel" aria-label="Command editor">
+      <div class="panel-top"><span class="section-kicker">01 / WRITE A COMMAND</span><span id="cwd-label" class="mono">demo-project /</span></div>
+      <form id="command-form">
+        <label class="command-label" for="command-input"><span aria-hidden="true">$</span><input id="command-input" value="cp notes.txt backup/" aria-label="Shell command" aria-describedby="command-hint" autocomplete="off" spellcheck="false" placeholder="Type a command to explore…"></label>
+        <button class="primary-button" id="preview-button" type="submit">Preview changes <span aria-hidden="true">↗</span></button>
+      </form>
+      <div class="command-bottom"><span id="command-hint">Enter to preview. Preview first. Apply to a real folder only after review.</span><button class="text-button" id="reset-button">Reset workspace</button></div>
+      <div id="token-strip" class="token-strip" aria-label="Command tokens"></div>
+      <p id="token-explanation" class="token-explanation" aria-live="polite"></p>
+      <div id="status" class="status" role="status" aria-live="polite">Ready when you are. Try an example below, or write your own.</div>
+      <div id="repairs" class="repairs"></div><div id="recovery-evidence" class="recovery-evidence" aria-live="polite"></div>
+    </section>
 
-    <header>
-      <span class="site-name">CFG Parser</span>
-      <nav>
-        <button class="sample-btn active" data-sample="arithmetic">Arithmetic</button>
-        <button class="sample-btn" data-sample="simplification">Unit &amp; Useless</button>
-        <button class="sample-btn" data-sample="ambiguous">Ambiguous</button>
-        <div class="dropdown-wrap">
-          <button id="btn-malformed-toggle" class="sample-btn muted">Malformed ▾</button>
-          <div id="malformed-menu" class="dropdown hidden">
-            <button data-malformed="0">Missing '->'</button>
-            <button data-malformed="1">Missing LHS</button>
-            <button data-malformed="2">Trailing pipe</button>
-            <button data-malformed="3">Undefined NT</button>
-            <button data-malformed="4">Empty input</button>
-          </div>
-        </div>
-      </nav>
-    </header>
+    <section class="example-row" aria-label="Try an example"><span>TRY A SAMPLE SCENARIO</span><button data-example="copy"><span aria-hidden="true">↗</span> Make a copy</button><button data-example="delete"><span aria-hidden="true">−</span> Remove a file</button><button data-advanced data-example="chain"><span aria-hidden="true">&amp;&amp;</span> Follow a chain</button><button data-advanced data-example="pipe"><span aria-hidden="true">|</span> Filter output</button><button data-advanced data-example="nested">Nested groups</button><button data-advanced data-example="groupRepair">Recover a group</button><button data-example="repair"><span aria-hidden="true">?</span> Fix a mistake</button></section>
 
-    <main>
-      <div class="left">
-        <div class="section-label">
-          Grammar
-          <div class="left-actions">
-            <label class="check-label">
-              <input type="checkbox" id="chk-strict"> strict
-            </label>
-            <button id="btn-clear" class="link-btn">clear</button>
-          </div>
-        </div>
-
-        <textarea id="grammar-input" spellcheck="false" placeholder="E -> E+T | T
-T -> T*F | F
-F -> (E) | id"></textarea>
-
-        <div class="editor-footer">
-          <span class="hint">A -&gt; α | β &nbsp;·&nbsp; ε or eps for epsilon</span>
-          <span id="line-counter">3 lines</span>
-        </div>
-
-        <button id="btn-parse" class="parse-btn">Parse</button>
+    <section class="workspace-panel" aria-label="Workspace comparison">
+      <div class="workspace-heading"><div><span class="section-kicker">02 / EXPLORE THE IMPACT</span><h2>Your workspace, before &amp; after.</h2></div><div class="workspace-actions"><button id="folder-button" class="secondary-button">Open a real folder <span aria-hidden="true">↗</span></button><button id="sample-button" class="text-button">Use sample</button><input id="folder-input" type="file" webkitdirectory multiple hidden></div></div>
+      <p id="local-apply-note" class="tiny" role="status"></p><p id="workspace-info" class="workspace-info">Sample project · Full sample contents available · Changes exist only in memory</p>
+      <div class="comparison-grid">
+        <article class="file-pane"><div class="file-pane-heading"><h3>Before</h3><span id="before-count"></span></div><div id="before-tree" class="file-tree"></div></article>
+        <article class="file-pane after-pane"><div class="file-pane-heading"><h3>After preview <span aria-hidden="true">↗</span></h3><span id="change-count">No preview yet</span></div><div id="after-tree" class="file-tree"></div></article>
+        <aside class="impact-pane"><p class="section-kicker">THE SHORT VERSION</p><h3 id="impact-title">One command.<br>Zero guesswork.</h3><p id="impact-description">Preview a command to see the files it creates, changes, or removes.</p><div id="change-list" class="change-list"></div><label class="protect-label" for="protected-path">Watch a folder for changes</label><input id="protected-path" class="watch-input mono" value="/src" placeholder="/src" aria-describedby="watch-help"><p id="watch-help" class="tiny">An advisory warning, not a permission rule.</p><div id="protection-warning" class="protection-warning" role="status"></div></aside>
       </div>
+      <div class="workspace-footer"><p id="snapshot-note">A preview doesn’t change even the virtual workspace until you keep it.</p><div><button id="undo-button" class="secondary-button" disabled>↶ Undo</button><button id="real-apply-button" class="primary-button" disabled>Review &amp; apply to folder</button><button id="apply-button" class="secondary-button" disabled>Keep virtual changes</button></div></div>
+    </section>
 
-      <div class="right">
-        <div class="section-label">
-          Analysis
-          <div class="right-actions">
-            <span id="status-text" class="status"></span>
-            <button id="tab-visual" class="tab active">Summary</button>
-            <button id="tab-simplify" class="tab">Simplification</button>
-            <button id="tab-cnf" class="tab">CNF</button>
-            <button id="tab-trees" class="tab">Trees</button>
-            <button id="tab-resolve" class="tab">Resolve</button>
-            <button id="tab-rna" class="tab">RNA</button>
-            <button id="tab-json" class="tab">JSON</button>
-          </div>
-        </div>
+    <section class="trace-section"><div class="trace-heading"><div><span class="section-kicker">03 / UNDERSTAND THE WHY</span><h2>Follow the command.</h2></div><span class="tiny">Select a step to highlight its tokens.</span></div><div class="trace-grid"><div><div id="execution-trace" class="execution-trace"><p class="empty-state">Your execution trace will appear here.</p></div><div class="terminal"><div class="terminal-heading"><span>VIRTUAL OUTPUT</span><span id="exit-label">—</span></div><pre id="terminal-output">$ waiting for a preview</pre></div></div><article class="meaning-panel"><h3>What this command means</h3><div id="command-meaning"></div><button id="inspect-conversion" class="text-button">See its grammar conversion →</button></article></div></section>
 
-        <div id="error-section" class="error-block hidden">
-          <p class="error-title">Parse errors</p>
-          <div id="errors-container"></div>
-        </div>
+    </div>
+    <div id="conversions-view" role="tabpanel" aria-labelledby="conversions-tab" hidden><aside class="toc-explanation"><h2>Why a context-free grammar?</h2><p>Simple command signatures can be regular. Advanced mode adds recursively nested groups: <code>FACTOR → lparen S rparen</code>. Matching arbitrarily nested parentheses requires a stack; the CFG expresses that structure. Within this app’s 40-token limit, CYK checks membership and its parse tree determines grouping. The interpreter then checks file existence and calculates effects.</p><p><code>(cd src &amp;&amp; pwd) &amp;&amp; pwd</code> keeps directory changes inside the group. Groups share virtual file changes, return their last exit status, and can appear inside pipelines. Advanced groups remain preview-only for real folders.</p></aside><p class="eyebrow">THE THEORY BEHIND YOUR PREVIEW</p><h1>Command conversions.</h1><p>This uses the same command, grammar and CYK result as the Playground. Return there to change the command.</p>    <details class="grammar-workbench" id="grammar-workbench">
+      <summary>Your command grammar <span>Define the language the parser accepts</span></summary>
+      <p>Basic mode defines five commands with seven rules. Advanced mode adds flags, pipelines and conditional chains. The first rule is the start symbol. Edit the rules here to experiment.</p>
+      <div class="grammar-toolbar"><label for="grammar-preset">Preset</label><select id="grammar-preset"><option value="basic">Basic · 5 commands</option><option value="full">Advanced · full subset</option><option value="copy">Copy only (3 rules)</option><option value="readonly">Read-only commands</option><option value="custom">Custom grammar</option></select><button id="grammar-reset" class="text-button">Reset default</button><button id="grammar-apply" class="secondary-button">Apply grammar &amp; preview</button></div>
+      <label class="grammar-editor-label" for="command-grammar">CFG productions</label>
+      <textarea id="command-grammar" spellcheck="false" aria-describedby="grammar-boundary" rows="10"></textarea>
+      <p id="grammar-status" class="grammar-status" role="status" aria-live="polite">Loading the default grammar…</p>
+      <p id="grammar-boundary" class="tiny">Grammar rules control syntax. The interpreter still checks supported behavior, flags, and path existence. Custom rules cannot add executables or bypass the simulator’s command checks. Options precede operands in the default grammar; -- ends options.</p>
+      <details><summary>Token classes: how your command connects to the grammar</summary><p class="tiny">Keywords are recognized only at command positions. Other words become path, text, pattern, or command-specific flag classes. Use these lowercase terminals in your rules; uppercase names are non-terminals. Use eps for an empty production.</p><dl id="token-class-reference"></dl></details>
+    </details>
 
-        <div id="output-content">
-          <div class="meta-row">
-            <span class="mono meta-formula">G = (V<sub>N</sub>, V<sub>T</sub>, P, S)</span>
-            <span class="meta-stats">
-              S = <strong id="stat-start-symbol" class="mono">—</strong>
-              &nbsp;·&nbsp;
-              |V<sub>N</sub>| = <strong id="stat-nt-count" class="mono">—</strong>
-              &nbsp;·&nbsp;
-              |V<sub>T</sub>| = <strong id="stat-t-count" class="mono">—</strong>
-              &nbsp;·&nbsp;
-              |P| = <strong id="stat-prod-count" class="mono">—</strong>
-            </span>
-          </div>
+<section class="engine-panel" id="engine-panel"><h2>Your command through the parser</h2><p id="conversion-command" class="mono"></p><div id="conversion-tokens" class="token-strip" aria-label="Conversion input tokens"></div><p class="tiny">The authored grammar is simplified, then converted to binary CNF rules for CYK. This tree removes CNF helper symbols and restores your actual words. Unit rules such as COMMAND → COPY are collapsed. Select a node to highlight the input tokens above.</p><div id="parse-tree" class="parse-tree"></div><details open><summary>Grammar transformations &amp; token mapping</summary><p id="grammar-stage-counts" class="tiny"></p><h4>1. Authored grammar</h4><pre id="grammar-text"></pre><details><summary>2. After useless-symbol removal</summary><pre id="grammar-useful"></pre></details><details><summary>3. After epsilon removal</summary><pre id="grammar-epsilon"></pre></details><h4>4. Simplified grammar (unit productions removed)</h4><pre id="grammar-simplified"></pre><h4>5. CNF used by CYK</h4><pre id="grammar-cnf"></pre><p class="tiny">X_ symbols replace terminals inside longer rules; Y symbols split long rules into binary rules. These helpers appear in CYK cells but are removed from the displayed tree.</p><h4>Actual tokens → input classes</h4><pre id="normalized-tokens"></pre></details><details><summary>CYK computation</summary><div class="cyk-controls"><button id="cyk-prev" class="secondary-button" disabled>←</button><button id="cyk-play" class="secondary-button" disabled>Play</button><button id="cyk-next" class="secondary-button" disabled>→</button><span id="cyk-caption" class="tiny">Preview a command first.</span></div><div id="cyk-grid" class="cyk-grid"></div></details></section></div>
+    <footer><span>BEFORE YOU RUN <span class="brand-dot">/</span> A formal-language playground</span><p>Simulation has limits. Permissions, symlinks, shell expansion, redirection, and external programs aren’t modeled. This is a documented subset, not a safety guarantee.</p><button id="footer-conversions" class="text-button">Inspect command conversions ↗</button></footer>
+  </main>
 
-          <!-- Summary Tab -->
-          <div id="view-visual" class="view active">
-            <div class="symbol-row">
-              <span class="sym-label">V<sub>N</sub></span>
-              <span id="nt-set-display" class="mono sym-val">—</span>
-            </div>
-            <div class="symbol-row">
-              <span class="sym-label">V<sub>T</sub></span>
-              <span id="t-set-display" class="mono sym-val">—</span>
-            </div>
-
-            <hr>
-
-            <table id="rules-table">
-              <thead>
-                <tr>
-                  <th>NT</th>
-                  <th></th>
-                  <th>Productions</th>
-                </tr>
-              </thead>
-              <tbody id="productions-table-body"></tbody>
-            </table>
-          </div>
-
-          <!-- Simplification Tab -->
-          <div id="view-simplify" class="view hidden">
-            <div class="simplification-container" id="simplification-container">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-          <!-- CNF Tab -->
-          <div id="view-cnf" class="view hidden">
-            <div class="simplification-container" id="cnf-container">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-          <!-- Trees Tab -->
-          <div id="view-trees" class="view hidden">
-            <div class="trees-toolbar">
-              <input id="trees-input" class="trees-string-input mono" type="text" placeholder="id+id*id" spellcheck="false">
-              <button id="btn-show-trees" class="parse-btn trees-parse-btn">Show trees</button>
-              <span class="trees-quickfill-label">Quick fill:</span>
-              <button class="trees-quick-btn" data-val="id+id*id">id+id*id</button>
-              <button class="trees-quick-btn" data-val="id+id+id">id+id+id</button>
-            </div>
-            <div id="trees-verdict" class="trees-verdict"></div>
-            <div id="trees-nav" class="trees-nav hidden">
-              <button id="btn-trees-prev" class="trees-nav-btn">‹ Prev</button>
-              <span id="trees-page-label" class="trees-page-label"></span>
-              <button id="btn-trees-next" class="trees-nav-btn">Next ›</button>
-            </div>
-            <div id="trees-canvas" class="trees-canvas"></div>
-          </div>
-
-          <!-- Resolve Tab (Ambiguity Resolution Demo) -->
-          <div id="view-resolve" class="view hidden">
-            <div class="resolve-presets">
-              <span class="resolve-preset-label">Preset:</span>
-              <button type="button" class="resolve-preset-btn active" data-preset="arithmetic">Arithmetic (Precedence &amp; Associativity)</button>
-              <button type="button" class="resolve-preset-btn" data-preset="linear">Linear Recursion (S → aS | Sa | a)</button>
-              <button type="button" class="resolve-preset-btn" data-preset="dangling">Dangling Else</button>
-            </div>
-
-            <div class="resolve-grammars-grid">
-              <div class="resolve-grammar-col">
-                <label for="resolve-grammar-a" class="resolve-label">Grammar A (ambiguous)</label>
-                <textarea id="resolve-grammar-a" class="resolve-textarea mono" spellcheck="false" rows="5"></textarea>
-              </div>
-              <div class="resolve-grammar-col">
-                <label for="resolve-grammar-b" class="resolve-label">Grammar B (resolved)</label>
-                <textarea id="resolve-grammar-b" class="resolve-textarea mono" spellcheck="false" rows="5"></textarea>
-              </div>
-            </div>
-
-            <div id="resolve-note" class="resolve-note dim">Note: Grammar B also accepts parentheses; default test strings stay inside the language both accept (no parentheses).</div>
-
-            <div class="resolve-strings-section">
-              <label for="resolve-strings" class="resolve-label">Test strings (one per line)</label>
-              <textarea id="resolve-strings" class="resolve-strings-textarea mono" spellcheck="false" rows="4"></textarea>
-            </div>
-
-            <div class="resolve-actions">
-              <button id="btn-resolve-compare" class="parse-btn">Compare</button>
-              <span id="resolve-status" class="status"></span>
-            </div>
-
-            <div id="resolve-error-block" class="error-block hidden" style="margin-top: 0.75rem;">
-              <p class="error-title">Resolution error</p>
-              <div id="resolve-error-msg" class="error-item"></div>
-            </div>
-
-            <div id="resolve-results" class="resolve-results hidden">
-              <table class="resolve-table" id="resolve-table">
-                <thead>
-                  <tr>
-                    <th style="width: 25%;">String</th>
-                    <th style="width: 37%;">Grammar A</th>
-                    <th style="width: 38%;">Grammar B</th>
-                  </tr>
-                </thead>
-                <tbody id="resolve-table-body"></tbody>
-              </table>
-
-              <div id="resolve-summary" class="resolve-summary"></div>
-              <div id="resolve-explanation" class="resolve-explanation"></div>
-
-              <div id="resolve-trees-container" class="resolve-trees-container hidden">
-                <div class="resolve-trees-header">
-                  Parse Trees for <code id="resolve-selected-string" class="mono"></code>
-                  <span class="dim" style="font-weight: normal; font-size: 12px; margin-left: 0.5rem;">(Click a row above to select another string)</span>
-                </div>
-                <div class="resolve-trees-panes">
-                  <div class="resolve-tree-pane" id="resolve-pane-a">
-                    <div class="resolve-pane-title">Grammar A (Ambiguous)</div>
-                    <div id="resolve-nav-a" class="trees-nav hidden">
-                      <button id="btn-resolve-prev-a" class="trees-nav-btn">‹ Prev pair</button>
-                      <span id="resolve-page-label-a" class="trees-page-label"></span>
-                      <button id="btn-resolve-next-a" class="trees-nav-btn">Next pair ›</button>
-                    </div>
-                    <div id="resolve-canvas-a" class="resolve-pane-canvas"></div>
-                  </div>
-                  <div class="resolve-tree-pane" id="resolve-pane-b">
-                    <div class="resolve-pane-title">Grammar B (Resolved)</div>
-                    <div id="resolve-canvas-b" class="resolve-pane-canvas"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- RNA Tab (Secondary RNA Folding Analysis) -->
-          <div id="view-rna" class="view hidden">
-            <div class="rna-toolbar">
-              <input id="rna-input" class="rna-seq-input mono" type="text" aria-label="RNA sequence" placeholder="GGAAACC" spellcheck="false" autocomplete="off" value="GGAAACC">
-              <select id="rna-preset" class="rna-preset-select" aria-label="Folding preset">
-                <option value="strict">Strict hairpin</option>
-                <option value="permissive">Permissive</option>
-              </select>
-              <button id="btn-rna-fold" class="parse-btn">Fold</button>
-              <span class="rna-quickfill-label">Quick fill:</span>
-              <button type="button" class="rna-quick-btn" data-seq="GGAAACC" data-preset="strict">GGAAACC</button>
-              <button type="button" class="rna-quick-btn" data-seq="GCGC" data-preset="permissive">GCGC</button>
-            </div>
-            <div class="rna-disclaimer dim">Sample sequences are illustrative, not real molecules.</div>
-
-            <div id="rna-verdict" class="rna-verdict" role="status" aria-live="polite" aria-atomic="true"></div>
-
-            <div id="rna-output-container" class="rna-output-container hidden">
-              <!-- Large Arc Diagram -->
-              <div class="rna-section-title">Secondary Structure Arc Diagram:</div>
-              <div id="rna-arc-container" class="rna-arc-container"></div>
-              <div id="rna-selected-bracket" class="rna-selected-bracket mono"></div>
-
-              <!-- Fold Gallery -->
-              <div class="rna-section-title" style="margin-top: 1rem;">Fold Gallery:</div>
-              <div id="rna-gallery-grid" class="rna-gallery-grid"></div>
-              <div class="rna-note dim">Possible folds, not ranked by stability.</div>
-              <div class="rna-note dim">Crossing pairs (pseudoknots) cannot be generated by a context-free grammar.</div>
-
-              <!-- Tree Link Section -->
-              <div id="rna-tree-section" class="rna-tree-section">
-                <div class="rna-section-title">Parse Tree for Selected Fold:</div>
-                <p class="rna-note">Hover or focus a node to highlight its bases. Click or press Enter to keep the selection.</p>
-                <div id="rna-tree-canvas" class="rna-tree-canvas"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- JSON Tab -->
-          <div id="view-json" class="view hidden">
-            <div class="json-header">
-              <span class="mono dim">grammar object</span>
-              <button id="btn-copy-json" class="link-btn">copy</button>
-            </div>
-            <pre id="json-output"><code></code></pre>
-          </div>
-        </div>
-
-      </div>
-    </main>
-
-  </div>
-
-  <script src="app.js" type="module"></script>
+  <dialog id="help-dialog"><div class="dialog-header"><h2>A small, explicit language.</h2><button id="close-help" class="secondary-button">Close</button></div><p>Commands operate on an in-memory snapshot. Paths use /, are case-sensitive, and resolve from the virtual current directory. Use quotes for names with spaces. Basic mode accepts one command without flags; switch to Advanced for flags and chaining.</p><dl id="command-help"></dl><p id="advanced-help"><strong>Advanced flow:</strong> | passes standard output; &amp;&amp; continues on success; || continues on failure. Pipes bind more tightly; &amp;&amp; and || associate left to right. Pipeline status comes from its last command, without pipefail. A pipeline’s cd does not change the surrounding directory. Parentheses group commands recursively; directory changes inside a group stay inside it. Quote or escape parentheses to use them as literal arguments.</p><p><strong>Limits:</strong> one path per mkdir/touch/rm/ls/cat; one source and destination per cp/mv. No directory merging. grep uses literal substrings. Failed individual commands are atomic. No permissions, symlinks, variables, wildcard expansion, redirection, comments, background jobs or external programs. Maximum 40 tokens, 512 command characters, and 100,000 workspace entries.</p><p><strong>Real folders:</strong> use Browse or paste a local path. Preview is read-only; Review &amp; apply writes one supported Basic command after confirmation. Advanced commands and browser uploads remain preview-only. Changes are applied directly; no recovery copies are created. cat/grep cannot read imported contents. Excluded folders cannot be moved or removed through an ancestor.</p><button id="folder-fallback-button" class="secondary-button">Use compatible folder picker</button><p class="tiny">An alternative if your browser cannot open the main folder picker. Empty directories are omitted.</p><p><strong>Recovery:</strong> suggestions close quotes, balance group parentheses, or remove a misplaced connector/delimiter, then verify the candidate using CYK. Missing operands receive guidance without inventing file paths. Selecting a candidate shows the rejected input and reparse outcome. They are candidates, not inferred intent or globally minimal repairs.</p><p>Behavior references: <a href="https://www.gnu.org/software/bash/manual/html_node/Lists.html" target="_blank" rel="noreferrer">Bash command lists</a> · <a href="https://www.gnu.org/software/coreutils/manual/coreutils.html" target="_blank" rel="noreferrer">GNU Coreutils</a></p></dialog>
+  <dialog id="folder-dialog"><div class="dialog-header"><h2>Open a local folder</h2><button id="close-folder" class="secondary-button">Close</button></div><p>Choose a folder on the computer running this local server. Opening it reads names and sizes; it does not change files. Empty directories are included.</p><button id="native-folder-picker" class="secondary-button">Browse folders…</button><p>Or paste its full path:</p><form id="local-folder-form"><label for="local-folder-path">Folder path</label><input id="local-folder-path" class="watch-input" placeholder="C:\Users\you\Documents\demo" required><button id="open-local-folder" class="primary-button">Open folder</button></form><p id="folder-error" class="error-text" role="alert"></p><p class="tiny">.git, node_modules and any old backup folders are excluded. No folder-size limit. Up to 100,000 entries; folders expand on click. File contents are checked only for operations you preview for apply; nothing is sent to another service.</p><button id="metadata-folder-picker" class="text-button">Browser upload instead (preview only)</button></dialog>
+  <dialog id="apply-dialog"><div class="dialog-header"><h2>Apply this preview?</h2><button id="cancel-real-apply" class="secondary-button">Cancel</button></div><p id="apply-folder-path" class="mono"></p><pre id="apply-review"></pre><p>This changes real files. Changes are applied directly without backup copies. Replaced or deleted files cannot be restored through this app. A changed folder requires a new preview.</p><button id="confirm-real-apply" class="primary-button">Apply reviewed changes</button><p id="apply-error" class="error-text" role="alert"></p></dialog>
+  <script src="simulator.js" type="module"></script>
 </body>
 </html>
